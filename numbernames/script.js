@@ -1,3 +1,8 @@
+/* =========================
+   NUMBER NAMES GAME
+   PART 1
+========================= */
+
 const questions = [
 
 {
@@ -44,19 +49,17 @@ correctWord:"forty-one"
 
 ];
 
-const letters =
-[
+const letters = [
 "e","f","i","j",
 "n","o","r","s",
-"t","v","w","x"
+"t","v","w","x",
+"y"
 ];
 
 let currentQuestion = 0;
 let score = 0;
 let muted = false;
 let draggedLetter = "";
-
-/* ---------------- ELEMENTS ---------------- */
 
 const splash =
 document.getElementById("splashScreen");
@@ -97,23 +100,15 @@ document.getElementById("correctSound");
 const wrongSound =
 document.getElementById("wrongSound");
 
-/* ---------------- SPLASH ---------------- */
-
-setTimeout(()=>{
-
-splash.classList.remove("active");
-
-instruction.classList.add("active");
-
-speakInstructions();
-
-},5000);
-
-/* ---------------- SPEECH ---------------- */
+/* -----------------------
+   SPEECH
+----------------------- */
 
 function speak(text){
 
 if(muted) return;
+
+if(!window.speechSynthesis) return;
 
 speechSynthesis.cancel();
 
@@ -121,7 +116,6 @@ const speech =
 new SpeechSynthesisUtterance(text);
 
 speech.rate = 0.9;
-speech.pitch = 1;
 
 speechSynthesis.speak(speech);
 
@@ -135,13 +129,40 @@ speak(
 
 }
 
-/* ---------------- START ---------------- */
+/* -----------------------
+   SPLASH
+----------------------- */
 
-startBtn.addEventListener("click",()=>{
+setTimeout(()=>{
 
-instruction.classList.remove("active");
+splash.classList.remove("active");
 
-game.classList.add("active");
+instruction.classList.add("active");
+
+speakInstructions();
+
+},5000);
+
+/* -----------------------
+   BUTTONS
+----------------------- */
+
+speakBtn.addEventListener(
+"click",
+speakInstructions
+);
+
+startBtn.addEventListener(
+"click",
+()=>{
+
+instruction.classList.remove(
+"active"
+);
+
+game.classList.add(
+"active"
+);
 
 bgMusic.volume = 0.3;
 
@@ -149,38 +170,35 @@ bgMusic.play().catch(()=>{});
 
 loadQuestion();
 
-});
+}
+);
 
-speakBtn.addEventListener("click",()=>{
-
-speakInstructions();
-
-});
-
-/* ---------------- MUTE ---------------- */
-
-muteBtn.addEventListener("click",()=>{
+muteBtn.addEventListener(
+"click",
+()=>{
 
 muted = !muted;
 
-if(muted){
+muteBtn.innerHTML =
+muted ? "🔇" : "🔊";
 
-muteBtn.innerHTML = "🔇";
+if(muted){
 
 bgMusic.pause();
 
 }
 else{
 
-muteBtn.innerHTML = "🔊";
-
 bgMusic.play().catch(()=>{});
 
 }
 
-});
+}
+);
 
-/* ---------------- LOAD QUESTION ---------------- */
+/* -----------------------
+   LOAD QUESTION
+----------------------- */
 
 function loadQuestion(){
 
@@ -189,31 +207,36 @@ questions[currentQuestion];
 
 document.getElementById(
 "numberDisplay"
-).innerHTML = q.number;
+).innerHTML =
+q.number;
 
 document.getElementById(
 "feedback"
 ).innerHTML = "";
 
-const wordContainer =
+const container =
 document.getElementById(
 "wordContainer"
 );
 
-wordContainer.innerHTML = "";
+container.innerHTML = "";
 
 q.displayWord.forEach(char=>{
 
-if(char===""){
+if(char === ""){
 
 const blank =
 document.createElement("div");
 
-blank.className = "blank";
+blank.className =
+"blank";
 
-blank.dataset.value = "";
+blank.dataset.value =
+"";
 
-wordContainer.appendChild(blank);
+container.appendChild(
+blank
+);
 
 }
 else{
@@ -221,11 +244,15 @@ else{
 const fixed =
 document.createElement("div");
 
-fixed.className = "fixed";
+fixed.className =
+"fixed";
 
-fixed.innerHTML = char;
+fixed.innerHTML =
+char;
 
-wordContainer.appendChild(fixed);
+container.appendChild(
+fixed
+);
 
 }
 
@@ -243,7 +270,9 @@ q.number +
 
 }
 
-/* ---------------- LETTER BANK ---------------- */
+/* -----------------------
+   LETTER BANK
+----------------------- */
 
 function createLetterBank(){
 
@@ -259,9 +288,11 @@ letters.forEach(letter=>{
 const tile =
 document.createElement("div");
 
-tile.className = "letter";
+tile.className =
+"letter";
 
-tile.innerHTML = letter;
+tile.innerHTML =
+letter;
 
 tile.draggable = true;
 
@@ -270,13 +301,13 @@ tile.addEventListener(
 dragStart
 );
 
-bank.appendChild(tile);
+bank.appendChild(
+tile
+);
 
 });
 
 }
-
-/* ---------------- DRAG ---------------- */
 
 function dragStart(e){
 
@@ -300,21 +331,6 @@ e=>{
 
 e.preventDefault();
 
-blank.classList.add(
-"hover"
-);
-
-}
-);
-
-blank.addEventListener(
-"dragleave",
-()=>{
-
-blank.classList.remove(
-"hover"
-);
-
 }
 );
 
@@ -337,13 +353,9 @@ draggedLetter;
 e.target.dataset.value =
 draggedLetter;
 
-e.target.classList.remove(
-"hover"
-);
-
-}
-
-/* ---------------- CHECK ---------------- */
+}/* =========================
+   PART 2
+========================= */
 
 checkBtn.addEventListener(
 "click",
@@ -355,20 +367,20 @@ function checkAnswer(){
 const q =
 questions[currentQuestion];
 
-let completedWord = "";
-
-let blankIndex = 0;
-
-q.displayWord.forEach(char=>{
-
-if(char===""){
-
 const blanks =
 document.querySelectorAll(
 ".blank"
 );
 
-completedWord +=
+let builtWord = "";
+
+let blankIndex = 0;
+
+q.displayWord.forEach(char=>{
+
+if(char === ""){
+
+builtWord +=
 blanks[blankIndex]
 .dataset.value || "";
 
@@ -377,14 +389,14 @@ blankIndex++;
 }
 else{
 
-completedWord += char;
+builtWord += char;
 
 }
 
 });
 
 if(
-completedWord ===
+builtWord ===
 q.correctWord
 ){
 
@@ -399,7 +411,9 @@ wrongAnswer();
 
 }
 
-/* ---------------- CORRECT ---------------- */
+/* -----------------------
+   CORRECT
+----------------------- */
 
 function correctAnswer(){
 
@@ -412,11 +426,18 @@ correctSound.currentTime = 0;
 
 correctSound.play();
 
+if(typeof confetti ===
+"function"){
+
 confetti({
+
 particleCount:150,
 spread:90,
 origin:{y:0.6}
+
 });
+
+}
 
 speak(
 "Excellent. That is correct."
@@ -426,7 +447,8 @@ score++;
 
 document.getElementById(
 "score"
-).innerHTML = score;
+).innerHTML =
+score;
 
 setTimeout(()=>{
 
@@ -450,7 +472,9 @@ loadQuestion();
 
 }
 
-/* ---------------- WRONG ---------------- */
+/* -----------------------
+   WRONG
+----------------------- */
 
 function wrongAnswer(){
 
@@ -469,7 +493,9 @@ speak(
 
 }
 
-/* ---------------- END SCREEN ---------------- */
+/* -----------------------
+   END SCREEN
+----------------------- */
 
 function showEndScreen(){
 
@@ -494,19 +520,19 @@ document.getElementById(
 "stars"
 );
 
-if(score===7){
+if(score === 7){
 
 stars.innerHTML =
 "⭐⭐⭐";
 
 }
-else if(score>=5){
+else if(score >= 5){
 
 stars.innerHTML =
 "⭐⭐";
 
 }
-else if(score>=3){
+else if(score >= 3){
 
 stars.innerHTML =
 "⭐";
@@ -525,7 +551,9 @@ speak(
 
 }
 
-/* ---------------- PLAY AGAIN ---------------- */
+/* -----------------------
+   PLAY AGAIN
+----------------------- */
 
 playAgainBtn.addEventListener(
 "click",
